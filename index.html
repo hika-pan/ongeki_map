@@ -194,9 +194,17 @@ const map = L.map('map', { zoomControl:false, tap:true })
 
 L.control.zoom({ position:'bottomright' }).addTo(map);
 
+// ベース：OSM標準
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | © <a href="https://www.openrailwaymap.org/">OpenRailwayMap</a>',
   maxZoom:19,
+}).addTo(map);
+
+// 重ねレイヤー：OpenRailwayMap（路線強調）
+L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
+  opacity: 0.6,
+  maxZoom:19,
+  subdomains:'abc',
 }).addTo(map);
 
 // ヘッダー下から地図が始まるようパディング設定
