@@ -1,0 +1,48 @@
+name: Update stores.json
+
+on:
+  schedule:
+    # 毎週月曜 18:00 UTC (日曜) = 月曜 03:00 JST に実行
+    - cron: '0 18 * * 0'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run scraper
+        run: npm run scrape
+
+      - name: Commit if changed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          # generated_at は毎回変わるので、stores 配列に差分があるかだけを判定
+          NEW=$(jq -S '.stores' stores.json)
+          OLD=$(git show HEAD:stores.json | jq -S '.stores')
+          if [ "$NEW" != "$OLD" ]; then
+            echo 'Meaningful changes detected.'
+            git add stores.json
+            DATE=$(date -u +'%Y-%m-%d')
+            git commit -m "data: update stores.json (${DATE})"
+            git push
+          else
+            echo 'Only generated_at changed, skipping commit.'
+          fi
