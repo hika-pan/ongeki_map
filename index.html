@@ -10,22 +10,8 @@
       integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer">
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css"
-      integrity="sha512-ENrTWqddXrLJsQS2A86QmvA17PkJ0GVm1bqj5aTgpeMAfDKN2+SIOLpKG8R/6KkimnhTb+VW5qqUHB/r1zaRgg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer">
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css"
-      integrity="sha512-fYyZwU1wU0QWB4Yutd/Pvhy5J1oWAwFXun1pt+Bps04WSe4Aq6tyHlT4+MHSJhD8JlLfgLuC4CbCnX5KHSjyCg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
         integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"
-        integrity="sha512-TiMWaqipFi2Vqt4ugRzsF8oRoGFlFFuqIi30FFxEPNw58Ov9mOy6LgC05ysfkxwLE0xVeZtmr92wVg9siAFRWA=="
         crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
 <style>
@@ -163,20 +149,14 @@ function syncHeader() {
 new ResizeObserver(syncHeader).observe(hdr);
 syncHeader();
 
-const cluster = L.markerClusterGroup({
-  showCoverageOnHover: false,
-  maxClusterRadius: 40,
-  disableClusteringAtZoom: 13,
-});
-map.addLayer(cluster);
+const layer = L.layerGroup().addTo(map);
 
 function render(stores) {
-  const markers = stores.map(s => {
-    const m = L.marker([s.lat, s.lng], { icon: PIN_ICON });
-    m.bindPopup(buildPopup(s), { maxWidth:290, minWidth:230 });
-    return m;
-  });
-  cluster.addLayers(markers);
+  for (const s of stores) {
+    L.marker([s.lat, s.lng], { icon: PIN_ICON })
+      .bindPopup(buildPopup(s), { maxWidth:290, minWidth:230 })
+      .addTo(layer);
+  }
   document.getElementById('cnt').textContent = stores.length.toLocaleString() + '店舗';
 }
 
