@@ -1,64 +1,85 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>オンゲキ 設置店舗マップ</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+      integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css"
+      integrity="sha512-ENrTWqddXrLJsQS2A86QmvA17PkJ0GVm1bqj5aTgpeMAfDKN2+SIOLpKG8R/6KkimnhTb+VW5qqUHB/r1zaRgg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css"
+      integrity="sha512-fYyZwU1wU0QWB4Yutd/Pvhy5J1oWAwFXun1pt+Bps04WSe4Aq6tyHlT4+MHSJhD8JlLfgLuC4CbCnX5KHSjyCg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
+        integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"
+        integrity="sha512-TiMWaqipFi2Vqt4ugRzsF8oRoGFlFFuqIi30FFxEPNw58Ov9mOy6LgC05ysfkxwLE0xVeZtmr92wVg9siAFRWA=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
 <style>
+:root {
+  --hdr-h: 0px;
+  --brand: #e63312;
+}
+
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body { height:100%; font-family:-apple-system,'Helvetica Neue',sans-serif; overflow:hidden; }
 
-#map { position:fixed; inset:0; z-index:0; }
+#map { position:absolute; top:var(--hdr-h); left:0; right:0; bottom:0; z-index:0; }
 
 header {
-position:fixed; top:0; left:0; right:0; z-index:100;
-background:rgba(255,255,255,0.95);
-backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-border-bottom:1px solid #e8e8e8;
-box-shadow:0 1px 8px rgba(0,0,0,0.08);
-padding:10px 14px 8px;
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  background:rgba(255,255,255,0.95);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid #e8e8e8;
+  box-shadow:0 1px 8px rgba(0,0,0,0.08);
+  padding:10px 14px;
 }
-.header-top { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
-.logo { font-size:15px; font-weight:800; color:#e63312; }
-.count { margin-left:auto; background:#e63312; color:#fff; border-radius:20px; padding:3px 11px; font-size:12px; font-weight:700; }
+.header-top { display:flex; align-items:center; gap:10px; }
+.logo { font-size:15px; font-weight:800; color:var(--brand); }
+.count { margin-left:auto; background:var(--brand); color:#fff; border-radius:20px; padding:3px 11px; font-size:12px; font-weight:700; }
+.updated { font-size:10px; color:#999; }
 
-.filter-bar { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
-.filter-bar::-webkit-scrollbar { display:none; }
-.fbtn {
-flex-shrink:0; padding:5px 13px; border-radius:20px;
-border:1.5px solid #ddd; background:#fff; color:#666;
-font-size:12px; font-weight:700; cursor:pointer;
-}
-.f-all    { background:#222!important; border-color:#222!important; color:#fff!important; }
-.f-gigo   { background:#0099cc!important; border-color:#0099cc!important; color:#fff!important; }
-.f-round1 { background:#d4900a!important; border-color:#d4900a!important; color:#fff!important; }
-.f-taito  { background:#8844cc!important; border-color:#8844cc!important; color:#fff!important; }
-.f-other  { background:#e63312!important; border-color:#e63312!important; color:#fff!important; }
-
-/* ポップアップ */
 .leaflet-popup-content-wrapper {
-border-radius:16px!important; padding:0!important; overflow:hidden;
-box-shadow:0 6px 24px rgba(0,0,0,0.15)!important;
+  border-radius:16px !important; padding:0 !important; overflow:hidden;
+  box-shadow:0 6px 24px rgba(0,0,0,0.15) !important;
 }
-.leaflet-popup-content { margin:0!important; min-width:230px; }
-.leaflet-popup-close-button { top:10px!important; right:10px!important; font-size:20px!important; color:#aaa!important; }
+.leaflet-popup-content { margin:0 !important; min-width:230px; }
+.leaflet-popup-close-button { top:10px !important; right:10px !important; font-size:20px !important; color:#aaa !important; }
 .pop { padding:14px 16px 12px; }
-.pop-chain { font-size:11px; font-weight:700; margin-bottom:3px; }
-.pop-name  { font-size:15px; font-weight:800; color:#111; line-height:1.3; margin-bottom:4px; }
-.pop-addr  { font-size:12px; color:#888; line-height:1.5; }
-.pop-btn   {
-display:block; padding:12px; background:#e63312; color:#fff;
-font-size:13px; font-weight:700; text-decoration:none; text-align:center;
+.pop-name { font-size:15px; font-weight:800; color:#111; line-height:1.3; margin-bottom:4px; }
+.pop-addr { font-size:12px; color:#888; line-height:1.5; }
+.pop-btn {
+  display:block; padding:12px; background:var(--brand); color:#fff;
+  font-size:13px; font-weight:700; text-decoration:none; text-align:center;
 }
 
-/* ズームボタン */
-.leaflet-control-zoom { border:none!important; box-shadow:0 2px 12px rgba(0,0,0,0.15)!important; }
-.leaflet-control-zoom a { width:44px!important; height:44px!important; line-height:44px!important; font-size:22px!important; }
-</style>
+.leaflet-control-zoom { border:none !important; box-shadow:0 2px 12px rgba(0,0,0,0.15) !important; }
+.leaflet-control-zoom a { width:44px !important; height:44px !important; line-height:44px !important; font-size:22px !important; }
 
+.loading {
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,0.9); z-index:2000; font-size:14px; color:#666;
+}
+.error {
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:#fff; border:1px solid var(--brand); border-radius:12px;
+  padding:20px 24px; z-index:2000; max-width:90%;
+  font-size:13px; color:#333; box-shadow:0 8px 32px rgba(0,0,0,0.15);
+}
+.error b { color:var(--brand); display:block; margin-bottom:6px; }
+</style>
 </head>
 <body>
 
@@ -67,200 +88,131 @@ font-size:13px; font-weight:700; text-decoration:none; text-align:center;
 <header id="hdr">
   <div class="header-top">
     <div class="logo">🎵 オンゲキ 設置店舗</div>
-    <div class="count" id="cnt">81店舗</div>
-  </div>
-  <div class="filter-bar" id="filterBar">
-    <button class="fbtn f-all" data-f="all">すべて</button>
-    <button class="fbtn" data-f="gigo">🔵 GiGO</button>
-    <button class="fbtn" data-f="round1">🟡 ラウンドワン</button>
-    <button class="fbtn" data-f="taito">🟣 タイトー</button>
-    <button class="fbtn" data-f="other">🔴 その他</button>
+    <div class="count" id="cnt">読み込み中…</div>
   </div>
 </header>
 
+<div class="loading" id="loading">店舗データを読み込み中…</div>
+
 <script>
-const CHAIN_COLOR = { gigo:'#0099cc', round1:'#d4900a', taito:'#8844cc', other:'#e63312' };
-const CHAIN_LABEL = { gigo:'GiGO', round1:'ラウンドワン', taito:'タイトー', other:'その他' };
-const FILTER_CLS  = { all:'f-all', gigo:'f-gigo', round1:'f-round1', taito:'f-taito', other:'f-other' };
+'use strict';
 
-const STORES = [
-  {name:"ＧｉＧＯ総本店",addr:"豊島区東池袋1-13-6",lat:35.7295,lng:139.7167},
-  {name:"東京レジャーランド池袋店",addr:"豊島区東池袋1-29-1",lat:35.7301,lng:139.7175},
-  {name:"ラウンドワン池袋店",addr:"豊島区東池袋1-14-1",lat:35.7297,lng:139.7170},
-  {name:"池袋ゲーセンミカドINランブルプラザ",addr:"豊島区東池袋1-42-19",lat:35.7310,lng:139.7185},
-  {name:"タイトーステーション池袋西口店",addr:"豊島区西池袋1-15-9",lat:35.7296,lng:139.7100},
-  {name:"シルクハット秋葉原",addr:"千代田区外神田1-10-9",lat:35.6994,lng:139.7720},
-  {name:"ゲームパニック秋葉原",addr:"千代田区外神田1-13-1",lat:35.6998,lng:139.7716},
-  {name:"ＧｉＧＯ秋葉原３号館２",addr:"千代田区外神田1-11-11",lat:35.6992,lng:139.7718},
-  {name:"ＧｉＧＯ秋葉原３号館",addr:"千代田区外神田1-11-11",lat:35.6991,lng:139.7717},
-  {name:"東京レジャーランド秋葉原2号店",addr:"千代田区外神田4-3-3",lat:35.7016,lng:139.7738},
-  {name:"タイトーステーション秋葉原店",addr:"千代田区外神田4-2-2",lat:35.7014,lng:139.7740},
-  {name:"東京レジャーランド秋葉原店",addr:"千代田区外神田1-9-5",lat:35.6990,lng:139.7722},
-  {name:"ＧｉＧＯ渋谷宮益坂",addr:"渋谷区渋谷1-14-14",lat:35.6592,lng:139.7019},
-  {name:"アミューズメントスペースASO：VIBA！",addr:"渋谷区恵比寿1-10-5",lat:35.6476,lng:139.7099},
-  {name:"ＧｉＧＯ新宿西口",addr:"新宿区西新宿1-12-5",lat:35.6896,lng:139.7005},
-  {name:"タイトー新宿南口ゲームワールド店",addr:"新宿区新宿3-35-8",lat:35.6897,lng:139.7039},
-  {name:"新宿スポーツランド本館",addr:"新宿区新宿3-22-12",lat:35.6899,lng:139.7028},
-  {name:"ゲームパニック新宿歌舞伎町",addr:"新宿区歌舞伎町1-20-1",lat:35.6938,lng:139.7022},
-  {name:"タイトーＢＩＧＢＯＸ高田馬場店",addr:"新宿区高田馬場1-35-3",lat:35.7124,lng:139.7034},
-  {name:"ＧｉＧＯ高田馬場",addr:"新宿区高田馬場4-7-5",lat:35.7128,lng:139.7039},
-  {name:"ＧｉＧＯ神楽坂",addr:"新宿区神楽坂2-11",lat:35.7028,lng:139.7397},
-  {name:"シルクハット蒲田西口",addr:"大田区西蒲田7-2-3",lat:35.5629,lng:139.7171},
-  {name:"ＧｉＧＯ大森",addr:"大田区山王2-1-5",lat:35.5774,lng:139.7336},
-  {name:"ＧｉＧＯ池上",addr:"大田区池上6-2-3",lat:35.5693,lng:139.7156},
-  {name:"SOYU ZAURUS WORLD大森店",addr:"大田区大森北2-13-1",lat:35.5815,lng:139.7358},
-  {name:"アドアーズ上野アメ横",addr:"台東区上野4-9-14",lat:35.7089,lng:139.7740},
-  {name:"世田谷オークラボウル",addr:"世田谷区桜3-24-1",lat:35.6516,lng:139.6355},
-  {name:"アミュージアムＯＳＣ店",addr:"練馬区東大泉2-34-1",lat:35.7523,lng:139.5908},
-  {name:"ミラクルイン中村橋",addr:"練馬区貫井1-1-2",lat:35.7457,lng:139.6490},
-  {name:"ＧｉＧＯ船堀",addr:"江戸川区船堀1-6-11",lat:35.6895,lng:139.8720},
-  {name:"ＧｉＧＯ西葛西",addr:"江戸川区西葛西5-1-14",lat:35.6720,lng:139.8708},
-  {name:"ＧｉＧＯアリオ葛西",addr:"江戸川区東葛西9-3-3",lat:35.6638,lng:139.8878},
-  {name:"ＧｉＧＯラパーク瑞江",addr:"江戸川区瑞江2-1-2",lat:35.6877,lng:139.8837},
-  {name:"ＧｉＧＯ調布",addr:"調布市布田4-2-4",lat:35.6519,lng:139.5453},
-  {name:"アミューズランドモナコ調布駅前店",addr:"調布市布田4-2-22",lat:35.6521,lng:139.5455},
-  {name:"アピナ荻窪店",addr:"杉並区上荻1-13-10",lat:35.7059,lng:139.6196},
-  {name:"ゲームスタジオキューブ高円寺店",addr:"杉並区高円寺南4-26-12",lat:35.7058,lng:139.6492},
-  {name:"ＧｉＧＯ八王子高倉",addr:"八王子市高倉町55-4",lat:35.6570,lng:139.3283},
-  {name:"シルクハット八王子",addr:"八王子市旭町2-5",lat:35.6601,lng:139.3387},
-  {name:"アピナ八王子みなみ野店",addr:"八王子市みなみ野1-2-1",lat:35.6097,lng:139.3582},
-  {name:"ソユーゲームフィールド南大沢店",addr:"八王子市南大沢2-28-1",lat:35.6103,lng:139.3760},
-  {name:"ＧｉＧＯイトーヨーカドー八王子",addr:"八王子市狭間町1462-1",lat:35.6422,lng:139.3465},
-  {name:"ＮＩＣＯＰＡ高尾店",addr:"八王子市東浅川町550-1",lat:35.6414,lng:139.3048},
-  {name:"ＧｉＧＯ自由が丘",addr:"目黒区自由が丘2-10-9",lat:35.6083,lng:139.6688},
-  {name:"ＧｉＧＯ赤羽",addr:"北区赤羽1-7-9",lat:35.7780,lng:139.7212},
-  {name:"ＧｉＧＯ赤羽駅前",addr:"北区赤羽1-2-4",lat:35.7781,lng:139.7208},
-  {name:"ｎａｍｃｏ王子サンスクエア店",addr:"北区王子1-4-1",lat:35.7617,lng:139.7371},
-  {name:"ＧｉＧＯ町田",addr:"町田市原町田6-13-17",lat:35.5441,lng:139.4471},
-  {name:"タイトーステーション町田店",addr:"町田市原町田6-21-23",lat:35.5440,lng:139.4458},
-  {name:"ラウンドワン町田店",addr:"町田市森野1-13-14",lat:35.5481,lng:139.4378},
-  {name:"ＧｉＧＯ南町田グランベリーパークシアター",addr:"町田市鶴間3-4-1",lat:35.5128,lng:139.4500},
-  {name:"タイトーステーション国分寺店",addr:"国分寺市本町3-5-11",lat:35.7018,lng:139.4832},
-  {name:"ｎａｍｃｏ中野店",addr:"中野区中野5-52-15",lat:35.7075,lng:139.6673},
-  {name:"アミューズメントゲームマグレブ",addr:"多摩市落合1-39-2",lat:35.6393,lng:139.4455},
-  {name:"ＧｉＧＯヴィータモールせいせき",addr:"多摩市関戸4-72",lat:35.6376,lng:139.4462},
-  {name:"ゲームサファリ大山",addr:"板橋区大山東町60-10",lat:35.7488,lng:139.7093},
-  {name:"ＧｉＧＯ成増",addr:"板橋区成増2-17-24",lat:35.7706,lng:139.6527},
-  {name:"ラウンドワン板橋店",addr:"板橋区相生町16-13",lat:35.7530,lng:139.6930},
-  {name:"ＧｉＧＯ立川",addr:"立川市柴崎町3-2-1",lat:35.6983,lng:139.4073},
-  {name:"タイトーステーション立川北口店",addr:"立川市曙町2-4-5",lat:35.6990,lng:139.4082},
-  {name:"ＷＯＲＬＤ ＧＡＭＥ ＣＩＲＣＵＳ",addr:"立川市羽衣町2-4-13",lat:35.7022,lng:139.3971},
-  {name:"タイトーステーション錦糸町楽天地店",addr:"墨田区江東橋4-27-14",lat:35.6976,lng:139.8152},
-  {name:"タイトーＦステーションオリナス錦糸町店",addr:"墨田区太平4-1-2",lat:35.6989,lng:139.8124},
-  {name:"アドアーズ新小岩",addr:"葛飾区新小岩1-44-4",lat:35.7003,lng:139.8649},
-  {name:"東京レジャーランド亀有店",addr:"葛飾区亀有3-21-2",lat:35.7669,lng:139.8466},
-  {name:"ＧｉＧＯ立石",addr:"葛飾区立石7-3-6",lat:35.7338,lng:139.8448},
-  {name:"ラウンドワン南砂店",addr:"江東区南砂6-7-15",lat:35.6748,lng:139.8345},
-  {name:"ラウンドワンダイバーシティ東京プラザ店",addr:"江東区青海1-1-10",lat:35.6264,lng:139.7774},
-  {name:"ラウンドワン吉祥寺店",addr:"武蔵野市吉祥寺本町1-11-22",lat:35.7034,lng:139.5803},
-  {name:"東京レジャーランド吉祥寺店",addr:"武蔵野市吉祥寺本町1-3-7",lat:35.7031,lng:139.5796},
-  {name:"ＧｉＧＯ府中",addr:"府中市西原町1-6-2",lat:35.6684,lng:139.4789},
-  {name:"ラウンドワン府中本町駅前",addr:"府中市本町1-13-3",lat:35.6668,lng:139.4812},
-  {name:"ＧｉＧＯ福生",addr:"福生市福生1076-1",lat:35.7387,lng:139.3311},
-  {name:"ウェアハウス入谷店",addr:"足立区入谷7-8-11",lat:35.7750,lng:139.7843},
-  {name:"ウェアハウス保木間店",addr:"足立区保木間1-1-19",lat:35.7836,lng:139.8110},
-  {name:"ＧｉＧＯ竹の塚",addr:"足立区竹の塚6-8-6",lat:35.7871,lng:139.7968},
-  {name:"キャロム青梅店",addr:"青梅市千ケ瀬町4-326-1",lat:35.7867,lng:139.2727},
-  {name:"ウェアハウス一橋学園店",addr:"小平市学園東町1-4-39",lat:35.7344,lng:139.4843},
-  {name:"ユーズランド日の出店",addr:"西多摩郡日の出町平井237-3",lat:35.7555,lng:139.2635},
-  {name:"ＧｉＧＯイオンモールむさし村山",addr:"武蔵村山市榎1-1-3",lat:35.7523,lng:139.3861},
-  {name:"ラウンドワン武蔵村山店",addr:"武蔵村山市伊奈平3-1-1",lat:35.7425,lng:139.3807},
-];
+const BRAND = '#e63312';
 
-function getChain(name) {
-  const n = name.replace(/[Ａ-Ｚａ-ｚ０-９]/g, c => String.fromCharCode(c.charCodeAt(0)-0xFEE0));
-  if (/GiGO|GIGO/i.test(n)) return 'gigo';
-  if (/ラウンドワン/.test(n)) return 'round1';
-  if (/タイトー/.test(n)) return 'taito';
-  return 'other';
-}
-function normName(s) {
-  return s.replace(/[Ａ-Ｚａ-ｚ０-９]/g, c => String.fromCharCode(c.charCodeAt(0)-0xFEE0));
-}
-function makeIcon(chain) {
-  const c = CHAIN_COLOR[chain];
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38">
-    <path d="M14 2C7.9 2 3 7 3 13C3 21 14 36 14 36S25 21 25 13C25 7 20.1 2 14 2Z" fill="${c}" stroke="white" stroke-width="1.5"/>
-    <circle cx="14" cy="13" r="5.5" fill="white"/>
-  </svg>`;
-  return L.divIcon({ html:svg, iconSize:[28,38], iconAnchor:[14,38], popupAnchor:[0,-40], className:'' });
+const PIN_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38">' +
+  '<path d="M14 2C7.9 2 3 7 3 13C3 21 14 36 14 36S25 21 25 13C25 7 20.1 2 14 2Z" fill="' + BRAND + '" stroke="white" stroke-width="1.5"/>' +
+  '<circle cx="14" cy="13" r="5.5" fill="white"/>' +
+  '</svg>';
+const PIN_ICON = L.divIcon({ html: PIN_SVG, iconSize:[28,38], iconAnchor:[14,38], popupAnchor:[0,-40], className:'' });
+
+// XSS-safe popup builder: DOM API only, no innerHTML for store data
+function buildPopup(store) {
+  const root = document.createElement('div');
+
+  const pop = document.createElement('div');
+  pop.className = 'pop';
+
+  const name = document.createElement('div');
+  name.className = 'pop-name';
+  name.textContent = store.name;
+  pop.appendChild(name);
+
+  const addr = document.createElement('div');
+  addr.className = 'pop-addr';
+  addr.textContent = '📍 ' + store.address;
+  pop.appendChild(addr);
+
+  root.appendChild(pop);
+
+  const btn = document.createElement('a');
+  btn.className = 'pop-btn';
+  btn.href = 'https://maps.google.com/maps?q=' +
+    encodeURIComponent(store.name + ' ' + store.address);
+  btn.target = '_blank';
+  btn.rel = 'noopener noreferrer';
+  btn.textContent = 'Googleマップで開く →';
+  root.appendChild(btn);
+
+  return root;
 }
 
-// ヘッダー高さ分マップをずらす
-function headerH() { return document.getElementById('hdr').getBoundingClientRect().height; }
-
-const map = L.map('map', { zoomControl:false, tap:true })
-  .setView([35.683, 139.650], 11);
+const map = L.map('map', { zoomControl:false })
+  .setView([37.5, 137.5], 5);
 
 L.control.zoom({ position:'bottomright' }).addTo(map);
 
-// ベース：OSM標準
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | © <a href="https://www.openrailwaymap.org/">OpenRailwayMap</a>',
-  maxZoom:19,
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | © <a href="https://www.openrailwaymap.org/">OpenRailwayMap</a> | データ: <a href="https://location.am-all.net/alm/location?gm=88">SEGA AM Location</a>',
+  maxZoom: 19,
 }).addTo(map);
 
-// 重ねレイヤー：OpenRailwayMap（路線強調）
 L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
   opacity: 0.6,
-  maxZoom:19,
-  subdomains:'abc',
+  maxZoom: 19,
+  subdomains: 'abc',
 }).addTo(map);
 
-// ヘッダー下から地図が始まるようパディング設定
-function applyPadding() {
+const hdr = document.getElementById('hdr');
+function syncHeader() {
+  const h = hdr.getBoundingClientRect().height;
+  document.documentElement.style.setProperty('--hdr-h', h + 'px');
   map.invalidateSize();
-  map.setView(map.getCenter(), map.getZoom());
 }
-setTimeout(() => {
-  map.invalidateSize();
-  const h = headerH();
-  document.getElementById('map').style.top = h + 'px';
-  map.invalidateSize();
-}, 100);
-window.addEventListener('resize', () => {
-  const h = headerH();
-  document.getElementById('map').style.top = h + 'px';
-  map.invalidateSize();
+new ResizeObserver(syncHeader).observe(hdr);
+syncHeader();
+
+const cluster = L.markerClusterGroup({
+  showCoverageOnHover: false,
+  maxClusterRadius: 40,
+  disableClusteringAtZoom: 13,
 });
+map.addLayer(cluster);
 
-let activeFilter = 'all';
-const activeMarkers = [];
-
-function buildMarkers() {
-  activeMarkers.forEach(m => m.remove());
-  activeMarkers.length = 0;
-  let count = 0;
-  STORES.forEach(s => {
-    const chain = getChain(s.name);
-    if (activeFilter !== 'all' && chain !== activeFilter) return;
-    count++;
-    const m = L.marker([s.lat, s.lng], { icon:makeIcon(chain) }).addTo(map);
-    m.bindPopup(`
-      <div class="pop">
-        <div class="pop-chain" style="color:${CHAIN_COLOR[chain]}">${CHAIN_LABEL[chain]}</div>
-        <div class="pop-name">${normName(s.name)}</div>
-        <div class="pop-addr">📍 ${s.addr}</div>
-      </div>
-      <a class="pop-btn" href="https://maps.google.com/maps?q=${encodeURIComponent(normName(s.name)+' '+s.addr)}" target="_blank">Googleマップで開く →</a>
-    `, { maxWidth:290, minWidth:230 });
-    activeMarkers.push(m);
+function render(stores) {
+  const markers = stores.map(s => {
+    const m = L.marker([s.lat, s.lng], { icon: PIN_ICON });
+    m.bindPopup(buildPopup(s), { maxWidth:290, minWidth:230 });
+    return m;
   });
-  document.getElementById('cnt').textContent = count + '店舗';
+  cluster.addLayers(markers);
+  document.getElementById('cnt').textContent = stores.length.toLocaleString() + '店舗';
 }
 
-document.getElementById('filterBar').addEventListener('click', e => {
-  const btn = e.target.closest('.fbtn');
-  if (!btn) return;
-  activeFilter = btn.dataset.f;
-  document.querySelectorAll('.fbtn').forEach(b => {
-    b.className = 'fbtn';
-    if (b.dataset.f === activeFilter) b.classList.add(FILTER_CLS[activeFilter]);
-  });
-  buildMarkers();
-});
+function showError(msg) {
+  const div = document.createElement('div');
+  div.className = 'error';
+  const b = document.createElement('b');
+  b.textContent = '読み込みエラー';
+  div.appendChild(b);
+  div.appendChild(document.createTextNode(msg));
+  document.body.appendChild(div);
+}
 
-buildMarkers();
+(async () => {
+  try {
+    const res = await fetch('./stores.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    render(data.stores);
+
+    if (data.generated_at) {
+      const d = new Date(data.generated_at);
+      const ymd = d.getFullYear() + '/' +
+        String(d.getMonth() + 1).padStart(2, '0') + '/' +
+        String(d.getDate()).padStart(2, '0');
+      const span = document.createElement('span');
+      span.className = 'updated';
+      span.textContent = '更新: ' + ymd;
+      document.querySelector('.header-top').appendChild(span);
+      syncHeader();
+    }
+  } catch (err) {
+    showError('stores.json を読み込めませんでした。(' + err.message + ')');
+  } finally {
+    document.getElementById('loading').remove();
+  }
+})();
 </script>
 
 </body>
