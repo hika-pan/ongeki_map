@@ -7,7 +7,7 @@ const OUT_PATH = resolve(import.meta.dirname, '..', 'stores.json');
 
 const GAME_ID = 88;
 const BASE = 'https://location.am-all.net/alm/location';
-const USER_AGENT = 'ongeki-map-scraper/1.0 (+https://github.com/hikariri/ongeki-map)';
+const USER_AGENT = 'ongeki-map-scraper/1.0 (+https://github.com/hika-pan/ongeki_map)';
 const THROTTLE_MS = 800;
 
 const PREFECTURES = [
