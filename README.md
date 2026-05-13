@@ -14,6 +14,6 @@
 
 オンゲキ・SEGA AM Location 等の名称・ロゴは株式会社セガの権利物です。本プロジェクトは非公式のファンメイドです。
 
-## 権利者の方へ
+## ご意見等
 
 本プロジェクトの掲載内容について、削除・修正等のご要望がある場合は [GitHub Issues](https://github.com/hika-pan/ongeki_map/issues) までご連絡ください。
